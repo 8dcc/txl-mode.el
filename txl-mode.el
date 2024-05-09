@@ -1,28 +1,39 @@
 ;;; txl-mode.el -- major mode for editing TXL programs and grammars.
-;; Markus Stoy (mstoy@gmx.de), Rostock (Germany), November/December 2003.
 
-;; Installation (only tested under XEmacs-21.4 for Linux and WindowsXP):
-;  - put this file into directory where Emacs can find it (within load-path)
-;  - add following lines to Emacs init file (.emacs or init.el or maybe something else)
-;  (require 'txl-mode)
-;  (add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
+;; Author: Markus Stoy (mstoy@gmx.de), Rostock (Germany)
+;; Date: November/December 2003.
+;; Version: 1.0.0
+;; URL: https://github.com/8dcc/big-font.el
+
+;; Installation using straight.el
+;;   (straight-use-package
+;;    '(txl-mode :type git :host github :repo "8dcc/txl-mode.el"))
+;;   (add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
+;;
+;; Manual Installation (only tested under XEmacs-21.4 for Linux and WindowsXP):
+;; - put this file into directory where Emacs can find it (within load-path)
+;; - add following lines to Emacs init file (.emacs or init.el or maybe something else)
+;;   (require 'txl-mode)
+;;   (add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
 
 ;; Features:
-;  - syntax highlighting (with font-lock-mode)
-;  - automatic indentation according to TXL style guide (perhaps stil buggy...)
-;  - compile/debug/run TXL program from within Emacs
-;  - comment/uncomment regions
-;  - insert skeletion rules/functions/defines, find and insert matching end's
-;  - abbreviations for keywords (with abbrev-mode; scroll down to see a list)
-;  - TXL submenu which contains all new functions and their keyboard shortcuts
+;; - syntax highlighting (with font-lock-mode)
+;; - automatic indentation according to TXL style guide (perhaps stil buggy...)
+;; - compile/debug/run TXL program from within Emacs
+;; - comment/uncomment regions
+;; - insert skeletion rules/functions/defines, find and insert matching end's
+;; - abbreviations for keywords (with abbrev-mode; scroll down to see a list)
+;; - TXL submenu which contains all new functions and their keyboard shortcuts
 
 ;; Wish list:
-;  - navigation (jump to nonterminal/function/rule under cursor, next/previous nonterminal/function/rule, ...)
-;  - use comint for run/debug/compile instead of simple shell-command? (which looks ugly under Windows)
+;; - navigation (jump to nonterminal/function/rule under cursor, next/previous
+;;   nonterminal/function/rule, ...)
+;; - use comint for run/debug/compile instead of simple shell-command? (which
+;;   looks ugly under Windows)
 
 ;; Known bugs:
-;  - 'x% is highlighted as comment
-;  - compile and debug don't work under Windows
+;; - 'x% is highlighted as comment
+;; - compile and debug don't work under Windows
 
 ;; Oct 16 2008, Ivan N. Veselov <veselov@gmail.com>
 ;; - added compatibility with Emacs (fixed GNU Emacs/XEmacs compatibility issues
@@ -31,9 +42,12 @@
 
 ;;; Code: ----------------------------------------------------------------------
 
+;;;###autoload
 (defvar txl-mode-hook nil "Normal hook run when entering TXL mode.")
 
-; syntax table -----------------------------------------------------------------
+;; syntax table ----------------------------------------------------------------
+
+;;;###autoload
 (defvar txl-mode-syntax-table
   (let ((table (make-syntax-table)))
     (modify-syntax-entry ?'  "'" table) ; apostrophe quotes
@@ -47,15 +61,19 @@
     table)
   "Syntax table used while in TXL mode.")
 
+;;;###autoload
 (defvar txl-mode-font-lock-syntax-alist
   '((?' . "/")                       ; ' escapes keywords and comments
     (?_ . "w"))                      ; don't highlight keyword_foo
   "Syntax used for highlighting TXL")
 
+;;;###autoload
 (defvar txl-mode-font-lock-syntactic-keywords
   '(("\"[^\"]*\\('\\)\"" 1 ".")))    ; ' doesn't escape inside strings
 
-; syntax highlighting ----------------------------------------------------------
+;; syntax highlighting ---------------------------------------------------------
+
+;;;###autoload
 (defvar txl-mode-keywords
   `(
     ;; preprocessor directives
@@ -98,10 +116,13 @@
                   'words)
      1 font-lock-keyword-face)
     ;; number
-    ("\\<[0-9]+\\([.][0-9]+\\)?\\([eE][-+]?[0-9]+\\)?\\>" 0 font-lock-constant-face))
+    ("\\<[0-9]+\\([.][0-9]+\\)?\\([eE][-+]?[0-9]+\\)?\\>"
+     0 font-lock-constant-face))
   "Keywords for font-lock-mode used while in TXL mode.")
 
-; abbreviations ----------------------------------------------------------------
+;; abbreviations ---------------------------------------------------------------
+
+;;;###autoload
 (defvar txl-mode-abbrev-table
   (let ((table (make-abbrev-table)))
     (define-abbrev table "ass" "assert" nil)
@@ -123,7 +144,9 @@
     table)
   "Abbrev table used while in TXL mode.")
 
-; keyboard shortcuts -----------------------------------------------------------
+;; keyboard shortcuts ----------------------------------------------------------
+
+;;;###autoload
 (defvar txl-mode-map
   (let ((map (make-sparse-keymap)))
     (if (functionp 'set-keymap-name)
@@ -142,7 +165,9 @@
     map)
   "Keymap for TXL mode.")
 
-; menubar ----------------------------------------------------------------------
+;; menubar ----------------------------------------------------------------------
+
+;;;###autoload
 (defvar txl-mode-menubar-menu
   '("T%_XL"
     ["Ru%_n " txl-mode-run :suffix (concat (txl-mode-get-name nil) "...")]
@@ -166,8 +191,10 @@
   "The last input file used for `txl-mode-run' and `txl-mode-debug'")
 (defvar txl-mode-options nil "The last options used for `txl-mode-run'")
 
-
-(defun txl-mode () ; -----------------------------------------------------------
+;; major mode ------------------------------------------------------------------
+
+;;;###autoload
+(defun txl-mode ()
   "Major mode for editing TXL programs and grammars.
 \\{txl-mode-map}
 Turning on TXL mode runs the normal hook `txl-mode-hook'."
@@ -202,26 +229,30 @@ Turning on TXL mode runs the normal hook `txl-mode-hook'."
 	(add-submenu nil txl-mode-menubar-menu)))
   (run-hooks 'txl-mode-hook))
 
-; code templates ---------------------------------------------------------------
+;; code templates --------------------------------------------------------------
 
+;;;###autoload
 (defun txl-mode-insert-define ()
   "Insert an empty nonterminal definition."
   (interactive)
   (insert "\ndefine \nend define")
   (end-of-line 0))
 
+;;;###autoload
 (defun txl-mode-insert-function ()
   "Insert an empty function."
   (interactive)
   (insert "\nfunction \n    replace\n    by\nend function")
   (end-of-line -2))
 
+;;;###autoload
 (defun txl-mode-insert-rule ()
   "Insert an empty rule."
   (interactive)
   (insert "\nrule \n    replace\n    by\nend rule")
   (end-of-line -2))
 
+;;;###autoload
 (defun txl-mode-insert-end ()
   "Insert matching end for define, rule, function etc."
   (interactive)
@@ -230,26 +261,31 @@ Turning on TXL mode runs the normal hook `txl-mode-hook'."
 	(insert (concat "end " current-block "\n\n"))
       (message "Not inside TXL block."))))
 
+;;;###autoload
 (defun txl-mode-uncomment-region ()
   "Uncomment region."
   (interactive)
   (comment-region (region-beginning) (region-end) -1))
 
-; compile, debug and run TXL programs ------------------------------------------
+;; compile, debug and run TXL programs -----------------------------------------
 
+;;;###autoload
 (defun txl-mode-compile ()
   "Compile TXL program."
   (interactive)
   (shell-command (concat "txlc " (txl-mode-get-name t)) "*TXL Compilation*"))
 
+;;;###autoload
 (defun txl-mode-debug (input-file)
   "Ask input file from user and debug TXL program."
   (interactive (list (read-file-name "Input file: " nil txl-mode-input-file t)))
   (setq txl-mode-input-file input-file)
-  (shell-command (concat "txldb " input-file " " (txl-mode-get-name t) " &") "*TXL Debug*")
+  (shell-command (concat "txldb " input-file " " (txl-mode-get-name t) " &")
+                 "*TXL Debug*")
   (other-window 1)
   (end-of-buffer))
 
+;;;###autoload
 (defun txl-mode-run (input-file &optional options)
   "Ask input file from user and run TXL program. With prefix arg
 ask for extra options as well."
@@ -260,26 +296,32 @@ ask for extra options as well."
   (setq txl-mode-input-file input-file)
   (if options (setq txl-mode-options options)
     (setq options ""))
-  (shell-command (concat "txl " options " " input-file " " (txl-mode-get-name t)) "*TXL Output*"))
+  (shell-command (concat "txl " options " " input-file " "
+                         (txl-mode-get-name t))
+                 "*TXL Output*"))
 
+;;;###autoload
 (defvar txl-mode-extension-regexp
   "[tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?"
   "A regexp that matches filename extensions used by TXL")
 
+;;;###autoload
 (defun txl-mode-get-name (full)
   "If buffer file name has ending used by TXL, return base name
-and ending `.Txl', otherwise return unchanged. The argument controls whether full path
-is included or not."
+and ending `.Txl', otherwise return unchanged. The argument controls whether
+full path is included or not."
   (let ((ext (file-name-extension buffer-file-name))
-        (base (file-name-sans-extension (file-name-nondirectory buffer-file-name))))
+        (base (file-name-sans-extension
+               (file-name-nondirectory buffer-file-name))))
     (concat (if full
                 (file-name-directory buffer-file-name) "")
             base
             (if (string-match txl-mode-extension-regexp ext)
                 ".Txl" ext))))
 
-; automatic indentation --------------------------------------------------------
+;; automatic indentation -------------------------------------------------------
 
+;;;###autoload
 (defun txl-mode-indent-line (&optional whole-exp)
   "Indent current line as TXL code.
 With argument, indent any additional lines of the same clause
@@ -300,6 +342,7 @@ rigidly along with this one (not yet)."
       (goto-char pos))
     (set-marker pos nil)))
 
+;;;###autoload
 (defun txl-mode-indent-level ()
   "Compute TXL indentation level."
   (save-excursion
@@ -321,6 +364,7 @@ rigidly along with this one (not yet)."
      ;; all other stuff: within blocks indent 8, outside do not indent
      (t (if (txl-mode-block) 8 0)))))
 
+;;;###autoload
 (defun txl-mode-block ()
   "If point is currently inside TXL block, return its name (define, rule, function, etc),
 otherwise return nil."
@@ -338,6 +382,7 @@ otherwise return nil."
 	    (setq searching nil within-block nil)))
       within-block)))
 
+;;;###autoload
 (defun txl-mode-indent-fun-level ()
   "Compute indentation level of first function call on previous line.
 If there is none, return 8 or 0, depending whether currently inside block."
