@@ -1,11 +1,11 @@
-Emacs Major Mode for TXL
+Emacs Major Mode for TXL (fork from txl.ca)
 
 Contributed by Markus Stoy, mstoy@gmx.de, Rostock (Germany), November/December 2003
 Updated for Emacs/X-Emacs compatibility, Ivan N. Veselov, veselov@gmail.com, October 2008
 A few updates and enhancements, Noam Postavsky, see https://github.com/npostavs/txl-mode
 
-Installation
-------------
+Manual installation
+-------------------
 
 1. Copy the file txl-mode.el to a directory where Emacs can find it
    (somewhere within load-path).  To install for yourself only, 
@@ -20,6 +20,17 @@ Installation
     (add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
 
 3. Test by editing a TXL source file.
+
+Installation using straight.el
+------------------------------
+
+Add the following to your emacs init file.
+
+    (straight-use-package
+     '(txl-mode :type git :host github :repo "8dcc/txl-mode.el"))
+    (add-to-list 'auto-mode-alist '("\\.\\([tT]xl\\|[gG]rm\\|[gG]rammar\\|[rR]ul\\(es\\)?\\|[mM]od\\(ule\\)?\\)$" . txl-mode))
+
+See also https://github.com/radian-software/straight.el
 
 Features
 --------
