@@ -2,7 +2,7 @@ Emacs Major Mode for TXL (fork from txl.ca)
 
 Contributed by Markus Stoy, mstoy@gmx.de, Rostock (Germany), November/December 2003
 Updated for Emacs/X-Emacs compatibility, Ivan N. Veselov, veselov@gmail.com, October 2008
-A few updates and enhancements, Noam Postavsky, see https://github.com/npostavs/txl-mode
+A few updates and enhancements, 8dcc, see https://github.com/8dcc/txl-mode.el
 
 Manual installation
 -------------------
